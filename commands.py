@@ -11,8 +11,7 @@ def run_function(instruction):
         raise CommandNotFoundException(
             f"[Error] Cannot find \"{instruction['type']}\" in any libary or function file")
 
-    params = get_params(instruction['params']) if not instruction['type'] in [
-        'while', 'do_while'] else instruction['params']
+    params = get_params(instruction['params']) if not instruction['type'] in ['while', 'do_while'] else instruction['params']
 
     return func(*params)
 
@@ -27,6 +26,7 @@ def run_code(instructions, program_functions=None):
 
 
 def get_params(_params):
+
     params = []
 
     for param in _params:
@@ -36,6 +36,11 @@ def get_params(_params):
             params.append(param)
 
     return params
+
+def clean_scope():
+    for variable in variables:
+        if variables[variable]['scope'] == 'local':
+            variables.pop(variable)
 
 
 def add(a, b):
@@ -93,17 +98,27 @@ def evaluate(cond1, op, cond2):
                 f"{op} is not a valid comparison operator")
 
 
-def set_var(name, value):
-    variables[name] = value
+def set_var(scope, name, value):
+    if name in variables:
+        if variables[name]['scope'] == 'const':
+            raise ConstantError(f'Variable {name} is constant and cannot be changed')
+        variables[name]['value'] = value
+    else:
+        variables[name] = {'scope': scope, 'value': value}
 
 
 def get_var(name):
-    return variables[name]
+    try:
+        return variables[name]['value']
+    except KeyError:
+        raise DataError(f'Variable {name} does not exist')
 
 
 def _repeat(_i, do):
     for i in range(_i):
         run_code(do)
+
+    clean_scope()
 
 
 def _while(cond, do):
@@ -113,6 +128,8 @@ def _while(cond, do):
             break
 
         run_code(do)
+
+    clean_scope()
 
 
 def do_while(do, cond):
@@ -124,6 +141,8 @@ def do_while(do, cond):
             break
 
         run_code(do)
+
+    clean_scope()
 
 
 def _and(cond1, cond2):
@@ -157,6 +176,7 @@ def call_function(name, params):
     run_code(functions[name]['instructions'])
 
     args = {}
+    clean_scope()
 
 def get_arg(name):
     return args[name]

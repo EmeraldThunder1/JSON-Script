@@ -6,3 +6,9 @@ class FileNotFoundException(Exception):
 
 class InvalidOperatorException(Exception):
     pass
+
+class ConstantError(Exception):
+    pass
+
+class DataError(Exception):
+    pass
