@@ -27,6 +27,9 @@ def run_code(instructions, program_functions=None):
 
 def get_params(_params):
 
+    if not type(_params) is list:
+        return _params
+
     params = []
 
     for param in _params:
@@ -38,10 +41,14 @@ def get_params(_params):
     return params
 
 def clean_scope():
+    remove = []
+
     for variable in variables:
         if variables[variable]['scope'] == 'local':
-            variables.pop(variable)
+            remove.append(variable)
 
+    for i in remove:
+        variables.pop(i)
 
 def add(a, b):
     return a + b
