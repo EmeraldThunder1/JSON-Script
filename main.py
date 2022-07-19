@@ -15,4 +15,4 @@ except IOError:
 
 instructions = file_data['instructions']
 
-run_code(instructions)
+run_code(instructions, file_data['functions'])

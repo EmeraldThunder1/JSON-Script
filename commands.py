@@ -1,7 +1,8 @@
 from errors import *
 
 variables = {}
-
+args = {}
+functions = {}
 
 def run_function(instruction):
     try:
@@ -16,7 +17,11 @@ def run_function(instruction):
     return func(*params)
 
 
-def run_code(instructions):
+def run_code(instructions, program_functions=None):
+    global functions
+
+    functions = program_functions
+
     for instruction in instructions:
         run_function(instruction)
 
@@ -141,6 +146,21 @@ def _bool(value):
 
     return bool(value)
 
+def call_function(name, params):
+    # Generate arguments
+
+    global args
+
+    for i in range(len(params)):
+        args[functions[name]['params'][i]] = params[i]
+
+    run_code(functions[name]['instructions'])
+
+    args = {}
+
+def get_arg(name):
+    return args[name]
+
 
 commands = {
     "print": print,
@@ -165,4 +185,6 @@ commands = {
     "or": _or,
     "and": _and,
     "not": _not,
+    "call_function": call_function,
+    "get_arg": get_arg,
 }
